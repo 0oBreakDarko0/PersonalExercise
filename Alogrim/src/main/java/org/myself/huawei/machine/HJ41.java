@@ -2,86 +2,46 @@ package org.myself.huawei.machine;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.Set;
 
 /**
  * HJ41.称砝码
  */
 public class HJ41 {
     private List<List<Integer>> results = new ArrayList<>();
+
     public static void main(String[] args) {
-        HJ41 solution = new HJ41();
-        System.out.println(solution.solution());
-    }
-
-    private int solution() {
         Scanner in = new Scanner(System.in);
-        while (in.hasNext()) {
-            //几种砝码
-            int weightTypes = in.nextInt();
-            //砝码质量
-            int[] weightMass = new int[weightTypes];
-            //砝码数量
-            int[] weightCounts = new int[weightTypes];
-
-            for (int i = 0; i < weightTypes; ++i) {
-                weightMass[i] = in.nextInt();
+        while (in.hasNextInt()) { // 注意 while 处理多个 case
+            HashSet<Integer> set = new HashSet<>();//存放所有可能的结果，不用担心重复问题
+            set.add(0);//初始化为0
+            //个数
+            int n = in.nextInt();
+            int[] w = new int[n];
+            int[] nums = new int[n];
+            for (int i = 0; i < n; i++) {
+                //砝码的重量
+                w[i] = in.nextInt();
+            }
+            for (int i = 0; i < n; i++) {
+                //砝码个数
+                nums[i] = in.nextInt();
             }
 
-            for (int i = 0; i < weightTypes; ++i) {
-                weightCounts[i] = in.nextInt();
-            }
+            //遍历砝码
+            for (int i = 0; i < n; i++) {
+                ArrayList<Integer> list = new ArrayList<>(set);//取当前所有的结果
 
-            List<Integer> weightDetail = new ArrayList<>();
-
-            for (int i = 0; i < weightTypes; i++) {
-                int currentWeight = weightMass[i];
-                int currentWeightCount = weightCounts[i];
-
-                for (int j = 0; j < currentWeightCount; j++) {
-                    weightDetail.add(currentWeight);
+                for (int j = 1; j <= nums[i]; j++) {//遍历个数
+                    for (int k = 0; k < list.size(); k++) {
+                        set.add(list.get(k) + w[i] * j);
+                    }
                 }
+
             }
 
-            //转化为数组
-            Integer[] weightDetailArr = weightDetail.toArray(new Integer[weightDetail.size()]);
-            //路径
-            LinkedList<Integer> track = new LinkedList<>();
-            boolean[] visited = new boolean[weightDetail.size()];
-            dfs(track, visited, weightDetailArr, 1, 0);
-
-            Set<Integer> finalResult = new HashSet<>();
-            for (List<Integer> cur : results) {
-                Integer integer = cur.stream().reduce(Integer::sum).get();
-                finalResult.add(integer);
-            }
-
-            return finalResult.size();
-        }
-
-        return 1;
-    }
-
-    private void dfs(LinkedList<Integer> track, boolean[] visited, Integer[] weightDetailArr, int limit, int currentStart) {
-        if (track.size() == limit) {
-            results.add(track);
-            return;
-        }
-
-        for (int i = currentStart; i < weightDetailArr.length; i++) {
-            if (visited[i]) {
-                continue;
-            }
-
-            visited[i] = true;
-            track.add(weightDetailArr[i]);
-            dfs(track, visited, weightDetailArr, limit + 1, i + 1);
-            visited[i] = false;
-            track.removeLast();
+            System.out.println(set.size());
         }
     }
-
 }
