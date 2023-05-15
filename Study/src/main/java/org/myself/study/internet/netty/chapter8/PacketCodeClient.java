@@ -1,14 +1,32 @@
 package org.myself.study.internet.netty.chapter8;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.myself.study.internet.netty.chapter8.Command.LOGIN_REQUEST;
+import static org.myself.study.internet.netty.chapter8.Command.LOGIN_RESPONSE;
 
 public class PacketCodeClient {
     private static final int MAGIC_NUMBER = 0x12345678;
 
-    public ByteBuf encode(Packet packet) {
-        //创建buf对象
-        ByteBuf buf = ByteBufAllocator.DEFAULT.ioBuffer();
+    public static final PacketCodeClient INSTANCE = new PacketCodeClient();
+
+    private final Map<Byte, Class<? extends Packet>> packetMap;
+
+    private final Map<Byte, Serializer> serializerMap;
+
+    public PacketCodeClient() {
+        packetMap = new HashMap<>();
+        packetMap.put(LOGIN_REQUEST, LoginRequestPacket.class);
+        packetMap.put(LOGIN_RESPONSE, LoginResponsePacket.class);
+        serializerMap = new HashMap<>();
+        Serializer serializer = new JSONSerializer();
+        serializerMap.put(serializer.getSerializerAlgorithm(), serializer);
+    }
+
+    public ByteBuf encode(ByteBuf buf, Packet packet) {
 
         //序列化 Java 对象
         byte[] serialize = Serializer.DEFAULT.serialize(packet);
@@ -49,11 +67,11 @@ public class PacketCodeClient {
         return null;
     }
 
-    private Class<? extends Packet> getRequestType(int command) {
-        return LoginRequestPacket.class;
+    private Class<? extends Packet> getRequestType(Byte command) {
+        return packetMap.get(command);
     }
 
     private Serializer getSerializer(byte serializeAlgorithm) {
-        return Serializer.DEFAULT;
+        return serializerMap.get(serializeAlgorithm);
     }
 }
