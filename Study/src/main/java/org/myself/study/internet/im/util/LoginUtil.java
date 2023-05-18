@@ -10,7 +10,7 @@ public class LoginUtil {
         channel.attr(Attributes.LOGIN).set(true);
     }
 
-    public boolean hasLogin(Channel channel) {
+    public static boolean hasLogin(Channel channel) {
         Attribute<Boolean> attr = channel.attr(Attributes.LOGIN);
 
         return attr.get() != null;

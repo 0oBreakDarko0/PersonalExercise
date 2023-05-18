@@ -14,26 +14,29 @@ import java.util.UUID;
 public class LoginResponseHandler extends SimpleChannelInboundHandler<LoginResponsePacket> {
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println(new Date() + ": 开始发送登录信息");
-        //创建登陆对象
+    public void channelActive(ChannelHandlerContext ctx) {
+        // 创建登录对象
         LoginRequestPacket loginRequestPacket = new LoginRequestPacket();
         loginRequestPacket.setUserId(UUID.randomUUID().toString());
-        loginRequestPacket.setUserName("老马");
-        loginRequestPacket.setPassword("123456");
+        loginRequestPacket.setUserName("flash");
+        loginRequestPacket.setPassword("pwd");
 
-        ByteBuf byteBuf = PacketCodeClient.INSTANCE.encode(ctx.alloc().buffer(), loginRequestPacket);
-        ctx.channel().writeAndFlush(byteBuf);
+        // 写数据
+        ctx.channel().writeAndFlush(loginRequestPacket);
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, LoginResponsePacket loginResponsePacket) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, LoginResponsePacket loginResponsePacket) {
         if (loginResponsePacket.isSuccess()) {
+            System.out.println(new Date() + ": 客户端登录成功");
             LoginUtil.markAsLogin(ctx.channel());
-            System.out.println(new Date() + "： 客户端登录成功");
         } else {
-            System.out.println(new Date() + "： 客户端登录失败，原因：" +
-                    loginResponsePacket.getReason());
+            System.out.println(new Date() + ": 客户端登录失败，原因：" + loginResponsePacket.getReason());
         }
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) {
+        System.out.println("客户端连接被关闭!");
     }
 }

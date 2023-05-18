@@ -2,6 +2,7 @@ package org.myself.study.internet.im.server;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -9,37 +10,49 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import org.myself.study.internet.im.codec.PacketDecoder;
 import org.myself.study.internet.im.codec.PacketEncoder;
+import org.myself.study.internet.im.codec.Spliter;
+import org.myself.study.internet.im.server.handler.AuthHandler;
 import org.myself.study.internet.im.server.handler.LoginRequestHandler;
 import org.myself.study.internet.im.server.handler.MessageRequestHandler;
-import org.myself.study.internet.im.server.handler.ServerHandler;
+
+import java.util.Date;
 
 public class NettyServer {
-    public static void main(String[] args) {
-        ServerBootstrap serverBootstrap = new ServerBootstrap();
-        NioEventLoopGroup boss = new NioEventLoopGroup();
-        NioEventLoopGroup work = new NioEventLoopGroup();
+    private static final int PORT = 8000;
 
-        serverBootstrap.group(boss, work)
+    public static void main(String[] args) {
+        NioEventLoopGroup boosGroup = new NioEventLoopGroup();
+        NioEventLoopGroup workerGroup = new NioEventLoopGroup();
+
+        final ServerBootstrap serverBootstrap = new ServerBootstrap();
+        serverBootstrap
+                .group(boosGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
+                .option(ChannelOption.SO_BACKLOG, 1024)
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
+                .childOption(ChannelOption.TCP_NODELAY, true)
                 .childHandler(new ChannelInitializer<NioSocketChannel>() {
-                    @Override
-                    protected void initChannel(NioSocketChannel ch) throws Exception {
-                        //ch.pipeline().addLast(new ServerHandler());
+                    protected void initChannel(NioSocketChannel ch) {
+                        ch.pipeline().addLast(new Spliter());
                         ch.pipeline().addLast(new PacketDecoder());
                         ch.pipeline().addLast(new LoginRequestHandler());
+                        ch.pipeline().addLast(new AuthHandler());
                         ch.pipeline().addLast(new MessageRequestHandler());
                         ch.pipeline().addLast(new PacketEncoder());
-
-                    }
-                }).bind(8000)
-                .addListener(new GenericFutureListener<Future<? super Void>>() {
-                    @Override
-                    public void operationComplete(Future<? super Void> future) throws Exception {
-                        if (future.isSuccess()) {
-                            System.out.println("端口号[8000]绑定成功");
-                        }
                     }
                 });
 
+
+        bind(serverBootstrap, PORT);
+    }
+
+    private static void bind(final ServerBootstrap serverBootstrap, final int port) {
+        serverBootstrap.bind(port).addListener(future -> {
+            if (future.isSuccess()) {
+                System.out.println(new Date() + ": 端口[" + port + "]绑定成功!");
+            } else {
+                System.err.println("端口[" + port + "]绑定失败!");
+            }
+        });
     }
 }

@@ -16,7 +16,7 @@ import static org.myself.study.internet.im.protocol.command.Command.*;
 
 
 public class PacketCodeClient {
-    private static final int MAGIC_NUMBER = 0x12345678;
+    public static final int MAGIC_NUMBER = 0x12345678;
 
     public static final PacketCodeClient INSTANCE = new PacketCodeClient();
 
