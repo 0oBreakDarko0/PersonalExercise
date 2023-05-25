@@ -12,6 +12,7 @@
         <module>Alogrim</module>
         <module>Study</module>
         <module>kafka</module>
+      <module>springboot-starter-hello</module>
     </modules>
 
     <packaging>pom</packaging>
