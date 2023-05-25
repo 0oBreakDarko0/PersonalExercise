@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="Study" />
         <module name="Alogrim" />
+        <module name="springboot-starter-hello" />
         <module name="kafka" />
       </profile>
     </annotationProcessing>
