@@ -8,11 +8,11 @@
     <artifactId>Excercies</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-  <modules>
-        <module>Algorithm</module>
+    <modules>
         <module>Study</module>
         <module>kafka</module>
-      <module>AutoConfiguration</module>
+        <module>AutoConfiguration</module>
+        <module>Algorithm</module>
     </modules>
 
     <packaging>pom</packaging>
