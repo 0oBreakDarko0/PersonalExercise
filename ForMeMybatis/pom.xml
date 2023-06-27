@@ -10,4 +10,11 @@
     <artifactId>ForMeMybatis</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <dependencies>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.8.18</version>
+        </dependency>
+    </dependencies>
 </project>
